@@ -1,6 +1,6 @@
 class ContactUs extends HTMLElement {
   static get observedAttributes() {
-    return ['name'];
+    return ['name', 'prefill-subject', 'prefill-message'];
   }
 
   constructor() {
@@ -18,8 +18,22 @@ class ContactUs extends HTMLElement {
     }
   }
 
+  updateFormFields(data) {
+    const subjectInput = this.shadowRoot.querySelector('#subject');
+    const messageInput = this.shadowRoot.querySelector('#message');
+
+    if (data.subject && subjectInput) {
+      subjectInput.value = data.subject;
+    }
+    if (data.message && messageInput) {
+      messageInput.value = data.message;
+    }
+  }
+
   render() {
     const name = this.getAttribute('name') || 'Guest';
+    const prefillSubject = this.getAttribute('prefill-subject') || '';
+    const prefillMessage = this.getAttribute('prefill-message') || '';
 
     this.shadowRoot.innerHTML = `
       <style>
@@ -131,6 +145,15 @@ class ContactUs extends HTMLElement {
           font-size: 0.9rem;
           opacity: 0.9;
         }
+
+        .notification {
+          padding: 1rem;
+          margin-bottom: 1rem;
+          background: rgba(255, 255, 255, 0.2);
+          border-radius: 6px;
+          text-align: center;
+          font-size: 0.95rem;
+        }
       </style>
 
       <div class="contact-container">
@@ -138,6 +161,8 @@ class ContactUs extends HTMLElement {
           <h2>Get in Touch</h2>
           <p>Hello, ${name}! We'd love to hear from you.</p>
         </div>
+
+        <div id="notification" class="notification" style="display: none;"></div>
 
         <form class="contact-form">
           <div class="form-group">
@@ -147,12 +172,12 @@ class ContactUs extends HTMLElement {
 
           <div class="form-group">
             <label for="subject">Subject</label>
-            <input type="text" id="subject" placeholder="How can we help you?" required />
+            <input type="text" id="subject" placeholder="How can we help you?" value="${prefillSubject}" required />
           </div>
 
           <div class="form-group">
             <label for="message">Message</label>
-            <textarea id="message" placeholder="Tell us more about your inquiry..." required></textarea>
+            <textarea id="message" placeholder="Tell us more about your inquiry..." required>${prefillMessage}</textarea>
           </div>
 
           <button type="submit" class="submit-btn">Send Message</button>

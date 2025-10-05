@@ -186,6 +186,33 @@ class PortfolioWd extends HTMLElement {
           font-size: 1rem;
           opacity: 0.9;
         }
+
+        .contact-cta {
+          text-align: center;
+          margin-top: 3rem;
+        }
+
+        .contact-btn {
+          padding: 1rem 2rem;
+          background: #1e3a8a;
+          color: white;
+          border: none;
+          border-radius: 8px;
+          font-size: 1.1rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        .contact-btn:hover {
+          background: #3b82f6;
+          transform: translateY(-2px);
+          box-shadow: 0 5px 15px rgba(30, 58, 138, 0.3);
+        }
+
+        .contact-btn:active {
+          transform: translateY(0);
+        }
       </style>
 
       <div class="portfolio-container">
@@ -198,8 +225,8 @@ class PortfolioWd extends HTMLElement {
         </div>
 
         <div class="projects-grid">
-          ${projects.map(project => `
-            <div class="project-card">
+          ${projects.map((project, index) => `
+            <div class="project-card" data-project-index="${index}">
               <div class="project-image">${project.image}</div>
               <div class="project-content">
                 <h3 class="project-title">${project.title}</h3>
@@ -233,8 +260,47 @@ class PortfolioWd extends HTMLElement {
             </div>
           </div>
         </div>
+
+        <div class="contact-cta">
+          <button class="contact-btn" id="contactBtn">Interested? Contact Me</button>
+        </div>
       </div>
     `;
+
+    this.attachEventListeners(projects);
+  }
+
+  attachEventListeners(projects) {
+    const contactBtn = this.shadowRoot.querySelector('#contactBtn');
+    if (contactBtn) {
+      contactBtn.addEventListener('click', () => {
+        this.dispatchEvent(new CustomEvent('portfolio-contact-request', {
+          detail: {
+            url: this.getAttribute('url'),
+            timestamp: new Date().toISOString(),
+            message: 'User wants to inquire about portfolio projects'
+          },
+          bubbles: true,
+          composed: true
+        }));
+      });
+    }
+
+    const projectCards = this.shadowRoot.querySelectorAll('.project-card');
+    projectCards.forEach((card, index) => {
+      card.addEventListener('click', () => {
+        const project = projects[index];
+        this.dispatchEvent(new CustomEvent('project-selected', {
+          detail: {
+            project: project,
+            url: this.getAttribute('url'),
+            timestamp: new Date().toISOString()
+          },
+          bubbles: true,
+          composed: true
+        }));
+      });
+    });
   }
 }
 
