@@ -1,21 +1,24 @@
 "use client";
 
-import { WebComponentRenderer } from '@/components/WebComponentRenderer';
-import { webComponentConfigs } from '@/lib/webComponentConfigs';
+import { useEffect } from 'react';
 
 export default function PortfolioPage() {
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = '/webcomponents/portfolio-wd.js';
+    script.type = 'module';
+    document.body.appendChild(script);
+
+    return () => {
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    };
+  }, []);
+
   return (
-    <div className="space-y-6">
-      <div className="bg-white shadow rounded-lg p-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">Portfolio</h1>
-        <p className="text-gray-600 mb-6">
-          This page dynamically loads the portfolio web component.
-        </p>
-        <WebComponentRenderer 
-          config={webComponentConfigs.portfolio}
-          props={{ theme: 'professional' }}
-        />
-      </div>
+    <div className="min-h-screen py-8 px-4">
+      <portfolio-wd url="myportfoliocom"></portfolio-wd>
     </div>
   );
 }
